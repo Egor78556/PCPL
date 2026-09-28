@@ -1,0 +1,73 @@
+import sys
+
+class BiquadraticSolver:
+    def __init__(self):
+        self.a = None
+        self.b = None
+        self.c = None
+
+    def _get_coef(self, index, prompt):
+        if len(sys.argv) > index:
+            try:
+                return float(sys.argv[index])
+            except ValueError:
+                pass
+
+        while True:
+            try:
+                return float(input(prompt))
+            except ValueError:
+                print("Ошибка: некорректное число. Попробуйте снова.")
+
+    def input_coefficients(self):
+        self.a = self._get_coef(1, "Введите коэффициент A: ")
+        self.b = self._get_coef(2, "Введите коэффициент B: ")
+        self.c = self._get_coef(3, "Введите коэффициент C: ")
+
+    def solve(self):
+        if self.a == 0:
+            if self.b == 0:
+                return [] if self.c != 0 else ["Бесконечно много корней"]
+            t = -self.c / self.b
+            return [t**0.5, -t**0.5] if t > 0 else ([0.0] if t == 0 else [])
+
+        discriminant = self.b**2 - 4 * self.a * self.c
+        print(f"Дискриминант D = {discriminant}")
+
+        if discriminant < 0:
+            return []
+
+        roots = set()
+        t_list = []
+
+        if discriminant == 0:
+            t_list.append(-self.b / (2 * self.a))
+        else:
+            sq_d = discriminant**0.5
+            t_list.append((-self.b + sq_d) / (2 * self.a))
+            t_list.append((-self.b - sq_d) / (2 * self.a))
+
+        for t in t_list:
+            if t > 0:
+                roots.add(t**0.5)
+                roots.add(-t**0.5)
+            elif t == 0:
+                roots.add(0.0)
+
+        return sorted(list(roots))
+
+def main():
+    print("--- Объектно-ориентированный подход ---")
+    solver = BiquadraticSolver()
+    solver.input_coefficients()
+    roots = solver.solve()
+
+    if roots == ["Бесконечно много корней"]:
+        print("Уравнение имеет бесконечно много корней.")
+    elif not roots:
+        print("Действительных корней нет.")
+    else:
+        print(f"Действительные корни уравнения: {roots}")
+
+if __name__ == "__main__":
+    main()
