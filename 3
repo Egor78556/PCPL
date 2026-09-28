@@ -1,0 +1,76 @@
+import sys
+
+def parse_arg(index):
+    if len(sys.argv) > index:
+        try:
+            return float(sys.argv[index])
+        except ValueError:
+            return None
+    return None
+
+def read_coef(prompt, arg_val):
+    match arg_val:
+        case float(val):
+            return val
+        case _:
+            while True:
+                try:
+                    return float(input(prompt))
+                except ValueError:
+                    print("Ошибка ввода. Введите действительное число.")
+
+def solve_t(a, b, c):
+    """
+    Возвращает статус дискриминанта и корней вспомогательного уравнения At^2 + Bt + C = 0.
+    Использует match/case по знаку дискриминанта.
+    """
+    if a == 0:
+        return ("linear", [-c / b] if b != 0 else [])
+
+    d = b**2 - 4 * a * c
+    print(f"Дискриминант D = {d}")
+
+    # Сопоставление с образцом по условиям проверки дискриминанта
+    match d:
+        case _ if d < 0:
+            return ("no_roots", [])
+        case 0:
+            return ("one_t", [-b / (2 * a)])
+        case _ if d > 0:
+            sq_d = d**0.5
+            return ("two_t", [(-b + sq_d) / (2 * a), (-b - sq_d) / (2 * a)])
+
+def extract_x(t_values):
+    roots = set()
+    for t in t_values:
+        match t:
+            case _ if t > 0:
+                roots.add(t**0.5)
+                roots.add(-t**0.5)
+            case 0:
+                roots.add(0.0)
+            case _:
+                pass
+    return sorted(list(roots))
+
+def main():
+    print("--- Функциональный подход (match/case) ---")
+    a = read_coef("Введите коэффициент A: ", parse_arg(1))
+    b = read_coef("Введите коэффициент B: ", parse_arg(2))
+    c = read_coef("Введите коэффициент C: ", parse_arg(3))
+
+    status, t_values = solve_t(a, b, c)
+    roots = extract_x(t_values)
+
+    match (status, roots):
+        case ("no_roots", _):
+            print("Действительных корней нет (D < 0).")
+        case (_, []) if a != 0 or b != 0:
+            print("Действительных корней нет.")
+        case (_, _) if a == 0 and b == 0 and c == 0:
+            print("Уравнение имеет бесконечно много корней.")
+        case _:
+            print(f"Действительные корни уравнения: {roots}")
+
+if __name__ == "__main__":
+    main()
