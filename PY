@@ -1,0 +1,76 @@
+import sys
+
+def get_coef(index, prompt):
+    """
+    Получение коэффициента. Сначала пытаемся взять из sys.argv,
+    если недоступен или некорректен — запрашиваем с клавиатуры.
+    """
+    if len(sys.argv) > index:
+        try:
+            return float(sys.argv[index])
+        except ValueError:
+            pass  # Некорректный параметр командной строки игнорируется
+            
+    while True:
+        try:
+            return float(input(prompt))
+        except ValueError:
+            print("Ошибка: введите корректное действительное число.")
+
+def solve_biquadratic(a, b, c):
+    """
+    Вычисление действительных корней биквадратного уравнения Ax^4 + Bx^2 + C = 0.
+    """
+    if a == 0:
+        if b == 0:
+            return [] if c != 0 else ["Бесконечно много корней"]
+        t = -c / b
+        if t < 0:
+            return []
+        elif t == 0:
+            return [0.0]
+        else:
+            return [t**0.5, -t**0.5]
+
+    discriminant = b**2 - 4 * a * c
+    print(f"Дискриминант D = {discriminant}")
+
+    if discriminant < 0:
+        return []
+
+    roots = set()
+    t_list = []
+
+    if discriminant == 0:
+        t_list.append(-b / (2 * a))
+    else:
+        sq_d = discriminant**0.5
+        t_list.append((-b + sq_d) / (2 * a))
+        t_list.append((-b - sq_d) / (2 * a))
+
+    for t in t_list:
+        if t > 0:
+            roots.add(t**0.5)
+            roots.add(-t**0.5)
+        elif t == 0:
+            roots.add(0.0)
+
+    return sorted(list(roots))
+
+def main():
+    print("--- Процедурный подход ---")
+    a = get_coef(1, "Введите коэффициент A: ")
+    b = get_coef(2, "Введите коэффициент B: ")
+    c = get_coef(3, "Введите коэффициент C: ")
+
+    roots = solve_biquadratic(a, b, c)
+
+    if roots == ["Бесконечно много корней"]:
+        print("Уравнение имеет бесконечно много корней.")
+    elif not roots:
+        print("Действительных корней нет.")
+    else:
+        print(f"Действительные корни уравнения: {roots}")
+
+if __name__ == "__main__":
+    main()
